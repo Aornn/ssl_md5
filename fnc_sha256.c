@@ -6,7 +6,7 @@
 /*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/27 10:14:49 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/11 11:08:49 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/15 15:28:00 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,8 @@ void		update_snd_w(t_env_sha256 *e, int j)
 	e->a = e->temp1 + e->temp2;
 }
 
-void		update_fst_w(t_env_sha256 *e, int i, int j, uint32_t *padding)
+void		update_fst_w(t_env_sha256 *e, uint64_t i,\
+uint64_t j, uint32_t *padding)
 {
 	if (j < 16)
 	{
@@ -79,8 +80,8 @@ void		update_fst_w(t_env_sha256 *e, int i, int j, uint32_t *padding)
 void		ft_sha256(uint32_t *padding, t_env e_struc)
 {
 	t_env_sha256	e;
-	int				i;
-	int				j;
+	uint64_t		i;
+	uint64_t		j;
 
 	init_var_sha256(&e, e_struc, &i, &j);
 	while (i < e_struc.multiple_de_512)
@@ -101,6 +102,5 @@ void		ft_sha256(uint32_t *padding, t_env e_struc)
 		j = 0;
 		i++;
 	}
-	ft_printf("%.8x%.8x%.8x%.8x%.8x%.8x%.8x%.8x",\
-			e.h1, e.h2, e.h3, e.h4, e.h5, e.h6, e.h7, e.h8);
+	disp_sha256(e, e_struc);
 }

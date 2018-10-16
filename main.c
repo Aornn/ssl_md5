@@ -3,24 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rqueverd <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 11:20:05 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/11 11:21:03 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/16 16:05:19 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 #include <inttypes.h>
-
-void	ft_argc_2(t_env *e, int argc, t_select_hash *hash_choose)
-{
-	if (argc == 2)
-	{
-		create_hash_by_fd(e, 0, hash_choose, 1);
-		ft_putstr("\n");
-	}
-}
 
 void	print_s(char **argv, t_env *e, int *i, t_select_hash *hash_choose)
 {
@@ -48,7 +39,10 @@ void	manage_s_second(t_env *e, char **argv, int i,
 			ft_printf("%s (%s) = ", argv[1], argv[i]);
 		create_hash_by_fd(e, e->fd, hash_choose, 1);
 		if ((e->option & OPT_R) && !(e->option & OPT_Q))
+		{
 			ft_printf(" %s\n", argv[i]);
+			e->option = e->option & OPT_R;
+		}
 		else
 			ft_putstr("\n");
 	}
@@ -59,8 +53,8 @@ void	main_loop(int argc, char **argv, t_env *e, t_select_hash *hash_choose)
 {
 	int i;
 
-	i = 2;
-	while (i < argc)
+	i = 1;
+	while (i++ < argc - 1)
 	{
 		if (argv[i][0] == '-' && (argv[i][1] != 'p' && argv[i][1] != 'q' &&
 					argv[i][1] != 'r' && argv[i][1] != 's'))
@@ -70,7 +64,10 @@ void	main_loop(int argc, char **argv, t_env *e, t_select_hash *hash_choose)
 		else if (ft_strcmp(argv[i], "-q") == 0 && e->file_check == 0)
 			manage_q(e, hash_choose);
 		else if (ft_strcmp(argv[i], "-p") == 0 && e->file_check == 0)
-			;
+		{
+			if (i > e->check_f_p)
+				manage_p(e, hash_choose);
+		}
 		else
 		{
 			if (ft_strstr(argv[i], "-s") != NULL && e->file_check == 0)
@@ -78,31 +75,41 @@ void	main_loop(int argc, char **argv, t_env *e, t_select_hash *hash_choose)
 			else
 				manage_s_second(e, argv, i, hash_choose);
 		}
-		i++;
+	}
+}
+
+void	error_main(t_env *e, char **argv, int argc)
+{
+	if (argv[1] && (e->index = index_fnc(argv[1])) == -1)
+		exit(1);
+	if (argc < 2)
+	{
+		ft_putendl("usage: [md5 sha256 sha224] [-pqr] [-s string] [files ...]");
+		exit(1);
 	}
 }
 
 int		main(int argc, char **argv)
 {
-	int				i;
 	t_env			e;
 	t_select_hash	*hash_choose;
 
-	init_var_main(&e, argc, argv);
+	e.check_p = 0;
+	e.check_f_p = 0;
+	e.len_pos_p = 0;
+	e.fail_file = 0;
+	e.size_check = 1;
+	e.file_check = 0;
+	e.option = 00000000;
+	error_main(&e, argv, argc);
 	hash_choose = malloc(sizeof(t_select_hash) * nbr_cmd);
 	hash_choose[md5] = ft_md5;
 	hash_choose[sha256] = ft_sha256;
-	ft_argc_2(&e, argc, hash_choose);
+	hash_choose[sha224] = ft_sha256;
 	save_arg(&e, argc, argv);
-	i = 0;
-	while (i < e.len_pos_p)
-	{
-		create_hash_by_fd(&e, 0, hash_choose, i);
-		ft_putstr("\n");
-		i++;
-	}
+	init_var_main(&e, argc, argv, hash_choose);
+	ft_argc_2(&e, argc, hash_choose);
 	main_loop(argc, argv, &e, hash_choose);
-	free(e.pos_p);
 	free(hash_choose);
 	close(e.fd);
 	if (e.fail_file)

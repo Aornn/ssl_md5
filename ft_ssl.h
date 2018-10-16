@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ssl.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rqueverd <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 11:21:14 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/11 11:23:25 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/16 16:52:20 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,38 +58,44 @@ static	uint32_t	g_sha256_k[64] = {0x428a2f98, 0x71374491, 0xb5c0fbcf,
 typedef struct		s_env
 {
 	char		*content;
-	int			multiple_de_512;
-	int			nbr_tab_content;
-	int			nb_zero;
-	int			input_bitsize;
-	uint64_t	size;
+	size_t		multiple_de_512;
+	size_t		nbr_tab_content;
+	size_t		size;
+	size_t		tmp_size;
+	size_t		i;
 	int			fd;
+	int			first_p;
 	int			index;
 	int			file_check;
 	int			option;
-	int			size_check;
-	int			*pos_p;
+	size_t		size_check;
 	int			len_pos_p;
 	int			fail_file;
+	int			check_r;
+	int			check_p;
+	int			check_q;
+	int			check_f_p;
+	int			check_files_p;
 }					t_env;
 
 typedef enum		e_cmd
 {
 	md5,
 	sha256,
+	sha224,
 	nbr_cmd
 }					t_cmd;
 
 typedef struct		s_env_md5
 {
 	uint32_t	i;
-	int			l;
+	uint64_t	l;
 	uint32_t	h0;
 	uint32_t	h1;
 	uint32_t	h2;
 	uint32_t	h3;
 	uint32_t	a_b_c_d[4];
-	uint32_t	f_g[2];
+	uint64_t	f_g[2];
 	uint32_t	temp;
 }					t_env_md5;
 
@@ -120,7 +126,7 @@ typedef struct		s_env_sha256
 	uint32_t	temp1;
 	uint32_t	s1;
 	uint32_t	ch;
-	int			nb_blocks;
+	uint64_t	nb_blocks;
 }					t_env_sha256;
 
 typedef	void		(*t_select_hash)(uint32_t *padding, t_env e);
@@ -143,13 +149,18 @@ void				prepare_data(t_env *e);
 void				wrong_opt(char **argv, int i);
 void				is_directory(char **argv, int i, t_env *e);
 void				no_file(char **argv, int i, t_env *e);
-void				init_var_main(t_env *e, int argc, char **argv);
+void				init_var_main(t_env *e, int argc, char **argv,
+		t_select_hash *hash_choose);
 void				create_hash_by_fd(t_env *e, int fd,
 		t_select_hash *hash_choose, int i);
 void				create_hash_by_s(t_env *e, char *in, char *argv,
 		t_select_hash *hash_choose);
 void				manage_q(t_env *e, t_select_hash *hash_choose);
 void				manage_r(t_env *e, t_select_hash *hash_choose);
-void				init_var_sha256(t_env_sha256 *e,
-		t_env e_struc, int *i, int *j);
+void				init_var_sha256(t_env_sha256 *e, t_env e_struc,
+		uint64_t *i, uint64_t *j);
+void				ft_argc_2(t_env *e, int argc, t_select_hash *hash_choose);
+void				disp_sha256(t_env_sha256 e, t_env e_struc);
+void				manage_p(t_env *e, t_select_hash *hash_choose);
+void				check_value_r(char *buf, char *output, int fd);
 #endif

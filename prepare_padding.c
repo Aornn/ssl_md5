@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   prepare_padding.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rqueverd <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 11:15:09 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/11 11:18:51 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/16 14:51:00 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,18 +16,16 @@ void		prepare_data(t_env *e)
 {
 	if (e->size_check == 1)
 		e->size = ft_strlen(e->content);
-	e->input_bitsize = e->size * 8;
 	e->multiple_de_512 = ((e->size * 8 + 64) / 512) + 1;
 	if (e->size % 4 == 0)
-		e->nbr_tab_content = (int)e->size / 4;
+		e->nbr_tab_content = e->size / 4;
 	else
-		e->nbr_tab_content = (int)e->size / 4 + 1;
-	e->nb_zero = (512 * e->multiple_de_512) - (64 + 1 + e->size * 8);
+		e->nbr_tab_content = e->size / 4 + 1;
 }
 
-uint32_t	*put_zero(uint32_t *padding, int nb_blocks)
+uint32_t	*put_zero(uint32_t *padding, size_t nb_blocks)
 {
-	int i;
+	size_t i;
 
 	i = 0;
 	while (i < nb_blocks)
@@ -38,7 +36,7 @@ uint32_t	*put_zero(uint32_t *padding, int nb_blocks)
 	return (padding);
 }
 
-uint32_t	*add_size(uint32_t *padding, int nb_blocks, t_env *e)
+uint32_t	*add_size(uint32_t *padding, size_t nb_blocks, t_env *e)
 {
 	if (e->index == md5)
 	{
@@ -53,14 +51,24 @@ uint32_t	*add_size(uint32_t *padding, int nb_blocks, t_env *e)
 	return (padding);
 }
 
+void		check_value_p(uint32_t *buf)
+{
+	if (buf == NULL)
+	{
+		ft_printf("Malloc error1\n");
+		exit(1);
+	}
+}
+
 uint32_t	*ft_padding(t_env *e)
 {
 	uint32_t	*padding;
-	int			emp;
-	int			nb_blocks;
+	size_t		emp;
+	size_t		nb_blocks;
 
 	nb_blocks = ((512 * e->multiple_de_512) / 32);
-	padding = (uint32_t *)malloc(sizeof(uint32_t) * nb_blocks);
+	if ((padding = malloc(sizeof(uint32_t) * nb_blocks)) == NULL)
+		check_value_p(padding);
 	padding = put_zero(padding, nb_blocks);
 	ft_memcpy(padding, e->content, e->size);
 	if (e->size % 4 == 0)

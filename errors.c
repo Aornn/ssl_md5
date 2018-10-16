@@ -3,23 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   errors.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rqueverd <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 11:09:00 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/11 11:09:17 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/15 17:26:19 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 
-/*
-**Handle errors
-*/
-
 void	wrong_opt(char **argv, int i)
 {
-	ft_putstr("md5: illegal option - ");
-	ft_putstr(argv[i]);
+	ft_putstr("md5: illegal option ");
+	ft_putendl(argv[i]);
+	ft_putendl("usage: [md5 sha256 sha224] [-pqr] [-s string] [files ...]");
 	exit(1);
 }
 
@@ -37,19 +34,54 @@ void	no_file(char **argv, int i, t_env *e)
 
 void	manage_q(t_env *e, t_select_hash *hash_choose)
 {
+	e->option = e->option | OPT_Q;
 	if (!(e->option & OPT_F) && !(e->option & OPT_S) &&
-			!(e->option & OPT_R))
+			!(e->option & OPT_R) && e->check_q == 0)
 	{
-		create_hash_by_fd(e, 0, hash_choose, 1);
-		ft_putstr("\n");
+		if (e->len_pos_p > 0)
+		{
+			if (e->index == md5)
+				ft_putstr("d41d8cd98f00b204e9800998ecf8427e\n");
+			else if (e->index == sha224)
+				ft_putstr("d14a028c2a3a2bc9476102bb28823\
+				4c415a2b01f828ea62ac5b3e42f\n");
+			else if (e->index == sha256)
+				ft_putstr("e3b0c44298fc1c149afbf4c8996fb9\
+				2427ae41e4649b934ca495991b7852b855\n");
+			e->check_q = 1;
+		}
+		else
+		{
+			create_hash_by_fd(e, 0, hash_choose, 1);
+			ft_putstr("\n");
+			e->check_q = 1;
+		}
 	}
 }
 
 void	manage_r(t_env *e, t_select_hash *hash_choose)
 {
-	if (!(e->option & OPT_F) && !(e->option & OPT_S))
+	e->option = e->option | OPT_R;
+	if (!(e->option & OPT_F) && !(e->option & OPT_S) && !(e->option & OPT_Q)
+			&& e->check_r == 0)
 	{
-		create_hash_by_fd(e, 0, hash_choose, 1);
-		ft_putstr("\n");
+		if (e->len_pos_p > 0)
+		{
+			if (e->index == md5)
+				ft_putstr("d41d8cd98f00b204e9800998ecf8427e\n");
+			else if (e->index == sha224)
+				ft_putstr("d14a028c2a3a2bc9476102bb28823\
+				4c415a2b01f828ea62ac5b3e42f\n");
+			else if (e->index == sha256)
+				ft_putstr("e3b0c44298fc1c149afbf4c8996fb9\
+				2427ae41e4649b934ca495991b7852b855\n");
+			e->check_r = 1;
+		}
+		else
+		{
+			create_hash_by_fd(e, 0, hash_choose, 1);
+			ft_putstr("\n");
+			e->check_r = 1;
+		}
 	}
 }
