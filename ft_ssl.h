@@ -6,7 +6,7 @@
 /*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 11:21:14 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/16 16:52:20 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/17 17:05:30 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,12 @@ typedef enum		e_cmd
 	nbr_cmd
 }					t_cmd;
 
+typedef struct		s_env_hash
+{
+    char	name[100];
+    void	(*ptr_hash)(uint32_t *padding, t_env e);
+}					t_env_hash;
+
 typedef struct		s_env_md5
 {
 	uint32_t	i;
@@ -129,8 +135,6 @@ typedef struct		s_env_sha256
 	uint64_t	nb_blocks;
 }					t_env_sha256;
 
-typedef	void		(*t_select_hash)(uint32_t *padding, t_env e);
-
 uint32_t			right_rotate(uint32_t n, uint32_t d);
 uint32_t			uint32_btl(uint32_t val);
 uint32_t			rotate_left(uint32_t v, uint32_t c);
@@ -149,18 +153,17 @@ void				prepare_data(t_env *e);
 void				wrong_opt(char **argv, int i);
 void				is_directory(char **argv, int i, t_env *e);
 void				no_file(char **argv, int i, t_env *e);
-void				init_var_main(t_env *e, int argc, char **argv,
-		t_select_hash *hash_choose);
-void				create_hash_by_fd(t_env *e, int fd,
-		t_select_hash *hash_choose, int i);
-void				create_hash_by_s(t_env *e, char *in, char *argv,
-		t_select_hash *hash_choose);
-void				manage_q(t_env *e, t_select_hash *hash_choose);
-void				manage_r(t_env *e, t_select_hash *hash_choose);
+void				init_var_main(t_env *e, int argc, char **argv);
+void				create_hash_by_fd(t_env *e, int fd, int i);
+void				create_hash_by_s(t_env *e, char *in, char *argv);
+void				manage_q(t_env *e);
+void				manage_r(t_env *e);
 void				init_var_sha256(t_env_sha256 *e, t_env e_struc,
 		uint64_t *i, uint64_t *j);
-void				ft_argc_2(t_env *e, int argc, t_select_hash *hash_choose);
+void				ft_argc_2(t_env *e, int argc);
 void				disp_sha256(t_env_sha256 e, t_env e_struc);
-void				manage_p(t_env *e, t_select_hash *hash_choose);
+void				manage_p(t_env *e);
 void				check_value_r(char *buf, char *output, int fd);
+static t_env_hash	g_hash[] = {{"md5", ft_md5},{"sha256", ft_sha256},{"sha224", ft_sha256}};
+
 #endif

@@ -6,7 +6,7 @@
 /*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 11:19:46 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/16 16:51:46 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/17 17:05:11 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,15 @@
 
 int			index_fnc(char *algo)
 {
-	if (ft_strcmp(algo, "md5") == 0)
-		return (md5);
-	else if (ft_strcmp(algo, "sha256") == 0)
-		return (sha256);
-	else if (ft_strcmp(algo, "sha224") == 0)
-		return (sha224);
+	size_t		i;
+
+	i = 0;
+	while (i < sizeof(g_hash) / sizeof(*g_hash))
+	{
+		if (ft_strcmp(algo, g_hash[i].name) == 0)
+			return (i);
+		i++;
+	}
 	ft_putstr("Error: ");
 	ft_putstr(algo);
 	ft_putendl(" is an invalid command");

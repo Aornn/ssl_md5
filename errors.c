@@ -6,7 +6,7 @@
 /*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 11:09:00 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/15 17:26:19 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/17 17:03:24 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	no_file(char **argv, int i, t_env *e)
 	e->fail_file = 1;
 }
 
-void	manage_q(t_env *e, t_select_hash *hash_choose)
+void	manage_q(t_env *e)
 {
 	e->option = e->option | OPT_Q;
 	if (!(e->option & OPT_F) && !(e->option & OPT_S) &&
@@ -52,14 +52,14 @@ void	manage_q(t_env *e, t_select_hash *hash_choose)
 		}
 		else
 		{
-			create_hash_by_fd(e, 0, hash_choose, 1);
+			create_hash_by_fd(e, 0, 1);
 			ft_putstr("\n");
 			e->check_q = 1;
 		}
 	}
 }
 
-void	manage_r(t_env *e, t_select_hash *hash_choose)
+void	manage_r(t_env *e)
 {
 	e->option = e->option | OPT_R;
 	if (!(e->option & OPT_F) && !(e->option & OPT_S) && !(e->option & OPT_Q)
@@ -79,7 +79,7 @@ void	manage_r(t_env *e, t_select_hash *hash_choose)
 		}
 		else
 		{
-			create_hash_by_fd(e, 0, hash_choose, 1);
+			create_hash_by_fd(e, 0, 1);
 			ft_putstr("\n");
 			e->check_r = 1;
 		}

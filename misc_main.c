@@ -6,17 +6,17 @@
 /*   By: rqueverd <rqueverd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/08 11:43:08 by rqueverd          #+#    #+#             */
-/*   Updated: 2018/10/16 16:57:02 by rqueverd         ###   ########.fr       */
+/*   Updated: 2018/10/17 17:03:34 by rqueverd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 
-void	manage_p(t_env *e, t_select_hash *hash_choose)
+void	manage_p(t_env *e)
 {
 	if (e->check_p == 0)
 	{
-		create_hash_by_fd(e, 0, hash_choose, 0);
+		create_hash_by_fd(e, 0, 0);
 	}
 	else
 	{
@@ -33,8 +33,7 @@ void	manage_p(t_env *e, t_select_hash *hash_choose)
 	e->check_p = 1;
 }
 
-void	init_var_main(t_env *e, int argc, char **argv,
-t_select_hash *hash_choose)
+void	init_var_main(t_env *e, int argc, char **argv)
 {
 	int i;
 	int check_s;
@@ -55,39 +54,36 @@ t_select_hash *hash_choose)
 		(e->check_files_p == 0)))
 		{
 			e->check_f_p = i;
-			manage_p(e, hash_choose);
+			manage_p(e);
 			e->len_pos_p++;
 		}
 		i++;
 	}
 }
 
-void	create_hash_by_fd(t_env *e, int fd, t_select_hash *hash_choose, int i)
+void	create_hash_by_fd(t_env *e, int fd, int i)
 {
 	uint32_t *padding;
-
 	e->content = read_file(fd, e);
 	if (i == 0)
 		ft_putstr(e->content);
 	prepare_data(e);
 	padding = ft_padding(e);
-	(*hash_choose[e->index])(padding, *e);
+	g_hash[e->index].ptr_hash(padding, *e);
 	free(e->content);
 	free(padding);
 }
 
-void	create_hash_by_s(t_env *e, char *in, char *argv,
-		t_select_hash *hash_choose)
+void	create_hash_by_s(t_env *e, char *in, char *argv)
 {
 	uint32_t *padding;
-
 	padding = NULL;
 	if (!(e->option & OPT_R) && !(e->option & OPT_Q))
 		ft_printf("%s (\"%s\") = ", argv, in);
 	e->content = ft_strdup(in);
 	prepare_data(e);
 	padding = ft_padding(e);
-	(*hash_choose[e->index])(padding, *e);
+	g_hash[e->index].ptr_hash(padding, *e);
 	if (e->option & OPT_R && !(e->option & OPT_Q))
 		ft_printf(" \"%s\"", in);
 	ft_putstr("\n");
@@ -95,11 +91,11 @@ void	create_hash_by_s(t_env *e, char *in, char *argv,
 	free(padding);
 }
 
-void	ft_argc_2(t_env *e, int argc, t_select_hash *hash_choose)
+void	ft_argc_2(t_env *e, int argc)
 {
 	if (argc == 2)
 	{
-		create_hash_by_fd(e, 0, hash_choose, 1);
+		create_hash_by_fd(e, 0, 1);
 		ft_putstr("\n");
 	}
 }
